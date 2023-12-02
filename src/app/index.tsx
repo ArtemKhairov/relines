@@ -1,7 +1,8 @@
 import { FC, ReactElement } from "react";
+import { Router } from "@/pages";
 
 const App: FC = (): ReactElement => {
-  return <div>Router</div>;
+  return <Router />;
 };
 
 export { App };
