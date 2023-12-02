@@ -1,5 +1,9 @@
-const UsersPage = () => {
-  return <div>UserPage</div>;
-};
+import { userSessionModel } from "@/features/user-session";
 
-export { UsersPage };
+export const UsersPage = () => {
+  return (
+    <userSessionModel.UserSessionProvider>
+      <div>div</div>
+    </userSessionModel.UserSessionProvider>
+  );
+};
