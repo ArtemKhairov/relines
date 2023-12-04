@@ -8,7 +8,8 @@ class UserStore implements ILocalStore {
   private _users: IPromiseBasedObservable<IUser[]> | null = null;
   private _usersFormated: IUser[] = [];
   private _usersToEvaluate: IUserEvaluate[] = [];
-  private _modal: boolean = false
+  private _modal: boolean = false;
+  private _banUser: IUserEvaluate | null = null;
 
   constructor() {
     makeAutoObservable(this, {}, { autoBind: true, deep: true });
@@ -35,7 +36,15 @@ class UserStore implements ILocalStore {
     return this._modal;
   }
 
-  setModal(open:boolean){
+  get banUser() {
+    return this._banUser;
+  }
+
+  setBanUser(user: IUserEvaluate) {
+    this._banUser = user;
+  }
+
+  setModal(open: boolean) {
     this._modal = open;
   }
 
@@ -62,18 +71,34 @@ class UserStore implements ILocalStore {
       return item === user;
     });
     const tmpUsers = [...this.usersToEvaluate];
-    if(tmpUsers[index].count === 5 || tmpUsers[index].count === -5){
-      return false
-    }else{
+    if (tmpUsers[index].count === 5 || tmpUsers[index].count === -5) {
+      return false;
+    } else {
       const value = symbol === "+" ? 1 : -1;
       tmpUsers[index].count = tmpUsers[index].count! + value;
+      if (tmpUsers[index].count === 5 || tmpUsers[index].count == -5) {
+        this.setBanUser(tmpUsers[index]);
+        this.setModal(true);
+      }
       this.setUsersToEvaluate(tmpUsers);
     }
   }
 
-  // changeCount(user:IUserEvaluate, symbol:string){
-    
-  // }
+  refreshUser(user: IUserEvaluate) {
+    const tmpUsers = toJS(
+      this.usersToEvaluate.filter((u: IUser) => {
+        console.log(u, user);
+        return u.id !== user.id;
+      })
+    );
+
+    const _user: IUserEvaluate = { ...user };
+    delete _user["count"];
+    const tmpFormated = [...this.usersFormated, user];
+    this.setUsersFormated(tmpFormated);
+    this.setUsersToEvaluate(tmpUsers);
+    this.setModal(false);
+  }
 
   setUsersToEvaluate(users: IUserEvaluate[]) {
     this._usersToEvaluate = users;
