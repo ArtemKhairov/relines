@@ -122,6 +122,7 @@ class UserStore implements ILocalStore {
     });
   }
 
+  // не успел доделать вычитывание конфиги из LocalStorage
   public init() {
     this.load();
     // const usersFormated = localStorage.usersFormated
