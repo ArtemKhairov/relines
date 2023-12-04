@@ -4,15 +4,24 @@ import { userSessionModel } from "@/features/user-session";
 import { List, Skeleton, Empty } from "antd";
 import { ListHeader } from "@/shared/ui/list-header";
 import { ListCard } from "@/shared/ui/list-card";
-import React from "react";
+import React, { useCallback } from "react";
+import { IUser } from "@/shared/api";
 
 const MemoItem = React.memo(ListCard);
 
 const UsersList = observer(() => {
-  const { users, usersFormated, load, loadMore } =
+  const { users, usersFormated, load, loadMore, setFormated } =
     userSessionModel.useUserListStore();
 
-  if (!users) {
+  const handleRemove = useCallback((data: IUser) => {
+    setFormated(data,"-");
+  }, []);
+
+  const handleAdd = useCallback((data: IUser) => {
+    setFormated(data, "+");
+  }, []);
+
+  if (!usersFormated) {
     return (
       <>
         <ListHeader action={load} nextAction={loadMore} />
@@ -31,7 +40,13 @@ const UsersList = observer(() => {
       <List
         bordered
         dataSource={usersFormated}
-        renderItem={(item) => <MemoItem user={item} />}
+        renderItem={(item) => (
+          <MemoItem
+            user={item}
+            actionTwo={handleRemove}
+            actionOne={handleAdd}
+          />
+        )}
       />
     </>
   );
